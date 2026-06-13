@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星际穿越 · 随机抽奖</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="vignette"></div>
+  <div id="scan-line"></div>
+
+  <div class="corner-deco tl"></div>
+  <div class="corner-deco tr"></div>
+  <div class="corner-deco bl"></div>
+  <div class="corner-deco br"></div>
+
+  <div class="ui-overlay">
+    <div id="title">星 际 穿 越</div>
+    <button id="btn-start">启 动 引 擎</button>
+  </div>
+
+  <div id="result-panel">
+    <div id="planet-name"></div>
+    <div id="planet-desc"></div>
+    <button id="btn-next" style="display:none">下一位 ⏭</button>
+    <button id="btn-retry">再次穿越</button>
+  </div>
+
+  <button id="btn-settings" title="设置">⚙</button>
+
+  <div id="settings-overlay" class="settings-hidden">
+    <div id="settings-modal">
+      <div class="settings-header">
+        <span>设 置</span>
+        <button id="btn-settings-close">✕</button>
+      </div>
+      <div class="settings-tabs">
+        <button class="tab-btn active" data-tab="data">数据源</button>
+        <button class="tab-btn" data-tab="opts">选项</button>
+      </div>
+      <div class="settings-body">
+        <div id="tab-data" class="tab-panel active">
+          <div class="field-label">预设数据</div>
+          <div class="preset-row">
+            <button class="preset-btn active-preset" data-preset="food">🍽 吃什么</button>
+            <button class="preset-btn" data-preset="drinks">🧋 喝什么</button>
+            <button class="preset-btn" data-preset="dessert">🍰 甜品</button>
+            <button class="preset-btn" data-preset="fruit">🍎 水果</button>
+            <button class="preset-btn" data-preset="snack">🍿 零食</button>
+            <button class="preset-btn" data-preset="testurl">🔗 测试数据</button>
+          </div>
+          <div class="field-label" style="margin-top:16px">数据格式</div>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="fmt" value="txt" checked> TXT（一行一个名字）</label>
+            <label class="radio-item"><input type="radio" name="fmt" value="csv"> CSV
+             <div class="csv-formats">
+            <div class="hint">格式1: id,name,emoji或imgUrl</div>
+            <div class="hint">格式2: id,name,emoji或imgUrl,title,subtitle或dept</div>
+            </label>
+            
+          </div>
+          </div>
+         
+          
+          <div class="field-label" style="margin-top:24px">当前星球数据</div>
+          <div id="builtin-count" class="hint"></div>
+          
+          <div class="field-label">粘贴数据 <span class="hint">或拖入 / 点击上传文件</span></div>
+          <div id="drop-zone">
+            <textarea id="data-input" rows="10" placeholder="张三&#10;李四&#10;王五&#10;..."></textarea>
+            <input type="file" id="file-input" accept=".txt,.csv,.text" hidden>
+          </div>
+          <div id="data-status" class="field-label"></div>
+          <button id="btn-load-data" class="btn-action">载入数据</button>
+          <button id="btn-clear-data" class="btn-action btn-secondary">恢复默认</button>
+        </div>
+        <div id="tab-opts" class="tab-panel">
+          <div class="field-label">标题文字</div>
+          <input type="text" id="opt-title" class="text-input" placeholder="星 际 穿 越" maxlength="30">
+          <div class="field-label" style="margin-top:24px">选中个数</div>
+          <div class="spin-row">
+            <button id="count-minus" class="spin-btn">−</button>
+            <span id="count-display">1</span>
+            <button id="count-plus" class="spin-btn">+</button>
+          </div>
+          <div class="field-label" style="margin-top:16px">音效</div>
+          <label class="toggle-row">
+            <span>启用音效</span>
+            <input type="checkbox" id="opt-sound" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <div class="field-label" style="margin-top:16px">抽取设置</div>
+          <label class="toggle-row">
+            <span>已抽中不再参与</span>
+            <input type="checkbox" id="opt-exclude-drawn" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <div class="field-label" style="margin-top:16px">BGM</div>
+          <div id="bgm-drop-zone" class="bgm-zone">
+            <span class="hint">拖入音频文件或点击上传 (mp3/ogg/wav)</span>
+            <input type="file" id="bgm-file-input" accept="audio/*" hidden>
+            <div id="bgm-status" class="field-label"></div>
+          </div>
+          <div class="field-label" style="margin-top:16px">事件音效</div>
+          <div class="sfx-list" id="sfx-list"></div>
+          
+
+          <div class="field-label" style="margin-top:24px">快捷键</div>
+          <div class="shortcuts-list">
+            <div class="shortcut-row"><kbd>Space</kbd> / <kbd>Enter</kbd> 启动 / 下一位</div>
+            <div class="shortcut-row"><kbd>M</kbd> 开关音效</div>
+            <div class="shortcut-row"><kbd>P</kbd> 打开设置</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

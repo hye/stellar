@@ -1,0 +1,74 @@
+import * as THREE from 'three';
+import { state } from '../state';
+import { Phase } from '../types';
+import { updateStarsWarp } from '../scene/stars';
+import { starMat } from '../scene/stars';
+import { allPlanetGroups, hideAllPlanets } from '../scene/planets';
+import { audioManager } from '../audio/manager';
+import { setHandler, transitionTo } from './machine';
+import { showResult, setWinnerCard } from '../ui/result';
+import { updateFlybySlots } from './idle';
+
+const APPROACH_DURATION = 1.5;
+
+export function startApproach(): void {
+  state.approachTime = 0;
+  hideAllPlanets();
+
+  const idx = state.selectedIdx;
+  if (idx >= 0 && idx < allPlanetGroups.length) {
+    const group = allPlanetGroups[idx];
+    group.visible = true;
+    group.position.set(0, 0, -30);
+    group.rotation.set(0, 0, 0);
+    group.scale.setScalar(0.3);
+  }
+
+  transitionTo(Phase.APPROACH);
+  setHandler(updateApproach);
+}
+
+function updateApproach(dt: number): void {
+  state.approachTime += dt;
+  const t = Math.min(state.approachTime / APPROACH_DURATION, 1);
+
+  if (starMat) {
+    starMat.uniforms.warpFactor.value = Math.max(0, (1 - t) * 0.5);
+  }
+
+  updateStarsWarp(dt);
+  updateFlybySlots(dt);
+
+  const idx = state.selectedIdx;
+  if (idx >= 0 && idx < allPlanetGroups.length) {
+    const group = allPlanetGroups[idx];
+    const ease = 1 - Math.pow(1 - t, 3);
+
+    group.position.z = -30 + ease * 26;
+    group.rotation.y = ease * 0.3;
+
+    const s = 0.3 + ease * 0.7;
+    group.scale.setScalar(s);
+  }
+
+  if (t >= 1) {
+    const idx = state.selectedIdx;
+    if (idx >= 0 && idx < allPlanetGroups.length) {
+      const group = allPlanetGroups[idx];
+      group.rotation.set(0, 0.3, 0);
+    }
+    transitionTo(Phase.RESULT);
+    setHandler(updateResultIdle);
+    audioManager.playSfx('result', state.settings.soundEnabled);
+    showResult();
+    setWinnerCard(idx);
+  }
+}
+
+function updateResultIdle(dt: number): void {
+  const idx = state.selectedIdx;
+  if (idx >= 0 && idx < allPlanetGroups.length) {
+    const group = allPlanetGroups[idx];
+    group.rotation.y += dt * 0.3;
+  }
+}
