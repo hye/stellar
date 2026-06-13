@@ -13,7 +13,7 @@
 
 | 按键 | 功能 |
 |------|------|
-| `空格` / `S` | 开始抽奖 / 跳过动画直接出结果 / 揭示下一位中奖者 / 全部揭示后重新开始 |
+| `空格` / `Enter` | 开始抽奖 / 跳过动画直接出结果 / 揭示下一位中奖者 / 全部揭示后重新开始 |
 | `M` | 开关音效 |
 | `,` | 打开设置 |
 | `.` | 关闭设置 |
@@ -56,7 +56,7 @@
 3,奶茶,🧋
 ```
 
-**CSV 格式（id,name,imgUrl）— 显示图片：**
+**CSV 格式1（id,name,imgUrl）格式2: (id,name,emoji或imgUrl,title,subtitle或dept) — imgUrl图片网址：**
 ```
 1,张三,https://example.com/zhangsan.jpg
 2,李四,https://example.com/lisi.png
