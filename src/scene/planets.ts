@@ -150,6 +150,38 @@ function createPlanetGroup(
   return group;
 }
 
+function getDayNightFactor(): number {
+  const hour = new Date().getHours();
+  const minute = new Date().getMinutes();
+  const t = hour + minute / 60;
+  if (t >= 6 && t < 18) {
+    if (t < 8) return (t - 6) / 2;
+    if (t > 16) return (18 - t) / 2;
+    return 1;
+  }
+  return 0;
+}
+
+const earthVertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const earthFragmentShader = `
+  uniform sampler2D dayTex;
+  uniform sampler2D nightTex;
+  uniform float dayFactor;
+  varying vec2 vUv;
+  void main() {
+    vec4 dayColor = texture2D(dayTex, vUv);
+    vec4 nightColor = texture2D(nightTex, vUv);
+    gl_FragColor = mix(nightColor, dayColor, dayFactor);
+  }
+`;
+
 function createEarthGroup(): THREE.Group {
   const group = new THREE.Group();
 
@@ -159,13 +191,19 @@ function createEarthGroup(): THREE.Group {
   const nightTex = texLoader.load('/src/texture/earth_night_4096.jpg');
   nightTex.colorSpace = THREE.SRGBColorSpace;
 
-  const mat = new THREE.MeshStandardMaterial({
-    map: dayTex,
-    roughness: 0.7,
-    metalness: 0.1,
+  const dayFactor = getDayNightFactor();
+
+  const earthMat = new THREE.ShaderMaterial({
+    uniforms: {
+      dayTex: { value: dayTex },
+      nightTex: { value: nightTex },
+      dayFactor: { value: dayFactor },
+    },
+    vertexShader: earthVertexShader,
+    fragmentShader: earthFragmentShader,
   });
 
-  const mesh = new THREE.Mesh(sharedPlanetGeo, mat);
+  const mesh = new THREE.Mesh(sharedPlanetGeo, earthMat);
   mesh.scale.setScalar(2);
   group.add(mesh);
 
