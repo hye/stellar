@@ -1,7 +1,7 @@
 import { state } from '../state';
 import { getCachedImage } from '../data/cache';
 import { planetNameEl, planetDescEl, btnNext, resultPanel, btnStart } from './dom';
-import { hideAllPlanets } from '../scene/planets';
+import { hideAllPlanets, isEarthEasterEgg } from '../scene/planets';
 import { audioManager } from '../audio/manager';
 import { startIdle } from '../animation/idle';
 import { startWarp } from '../animation/warp';
@@ -75,6 +75,9 @@ export function setWinnerCard(idx: number): void {
     planetNameEl.innerHTML = nameHtml;
 
     let descHtml = '';
+    if (isEarthEasterEgg) {
+      descHtml = '<div class="earth-easter">🌍 恭喜！你穿越到了地球！</div>';
+    }
     if (item.title) descHtml += `<div class="winner-title">${item.title}</div>`;
     if (item.subtitle) descHtml += `<div class="winner-subtitle">${item.subtitle}</div>`;
     if (item.desc) descHtml += `<div class="winner-desc-text">${item.desc}</div>`;

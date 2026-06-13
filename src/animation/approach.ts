@@ -3,7 +3,7 @@ import { state } from '../state';
 import { Phase } from '../types';
 import { updateStarsWarp } from '../scene/stars';
 import { starMat } from '../scene/stars';
-import { allPlanetGroups, hideAllPlanets } from '../scene/planets';
+import { hideAllPlanets, checkEarthEasterEgg, getActivePlanetGroup, isEarthEasterEgg } from '../scene/planets';
 import { audioManager } from '../audio/manager';
 import { setHandler, transitionTo } from './machine';
 import { showResult, setWinnerCard } from '../ui/result';
@@ -14,10 +14,10 @@ const APPROACH_DURATION = 1.5;
 export function startApproach(): void {
   state.approachTime = 0;
   hideAllPlanets();
+  checkEarthEasterEgg();
 
-  const idx = state.selectedIdx;
-  if (idx >= 0 && idx < allPlanetGroups.length) {
-    const group = allPlanetGroups[idx];
+  const group = getActivePlanetGroup();
+  if (group) {
     group.visible = true;
     group.position.set(0, 0, -30);
     group.rotation.set(0, 0, 0);
@@ -39,9 +39,8 @@ function updateApproach(dt: number): void {
   updateStarsWarp(dt);
   updateFlybySlots(dt);
 
-  const idx = state.selectedIdx;
-  if (idx >= 0 && idx < allPlanetGroups.length) {
-    const group = allPlanetGroups[idx];
+  const group = getActivePlanetGroup();
+  if (group) {
     const ease = 1 - Math.pow(1 - t, 3);
 
     group.position.z = -30 + ease * 26;
@@ -52,23 +51,21 @@ function updateApproach(dt: number): void {
   }
 
   if (t >= 1) {
-    const idx = state.selectedIdx;
-    if (idx >= 0 && idx < allPlanetGroups.length) {
-      const group = allPlanetGroups[idx];
+    const group = getActivePlanetGroup();
+    if (group) {
       group.rotation.set(0, 0.3, 0);
     }
     transitionTo(Phase.RESULT);
     setHandler(updateResultIdle);
     audioManager.playSfx('result', state.settings.soundEnabled);
     showResult();
-    setWinnerCard(idx);
+    setWinnerCard(state.selectedIdx);
   }
 }
 
 function updateResultIdle(dt: number): void {
-  const idx = state.selectedIdx;
-  if (idx >= 0 && idx < allPlanetGroups.length) {
-    const group = allPlanetGroups[idx];
+  const group = getActivePlanetGroup();
+  if (group) {
     group.rotation.y += dt * 0.3;
   }
 }

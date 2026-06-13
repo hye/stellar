@@ -210,6 +210,19 @@ body {
   white-space: nowrap;
 }
 
+.earth-easter {
+  font-size: 18px;
+  color: rgba(100, 220, 150, 0.9);
+  text-shadow: 0 0 20px rgba(100, 220, 150, 0.5);
+  margin-bottom: 12px;
+  animation: earthPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes earthPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
 .winner-card .img {
   width: 64px;
   height: 64px;

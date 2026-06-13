@@ -19,6 +19,10 @@ const sharedPlanetGeo = new THREE.SphereGeometry(1, 64, 64);
 
 export const allPlanetGroups: THREE.Group[] = [];
 export const planetMeshes: THREE.Mesh[] = [];
+export let earthGroup: THREE.Group | null = null;
+export let isEarthEasterEgg = false;
+
+const EARTH_CHANCE = 0.12;
 
 function simplex2d(x: number, y: number): number {
   const n = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
@@ -145,6 +149,42 @@ function createPlanetGroup(
   return group;
 }
 
+function createEarthGroup(): THREE.Group {
+  const group = new THREE.Group();
+
+  const texLoader = new THREE.TextureLoader();
+  const dayTex = texLoader.load('/src/texture/earth_day_4096.jpg');
+  dayTex.colorSpace = THREE.SRGBColorSpace;
+  const nightTex = texLoader.load('/src/texture/earth_night_4096.jpg');
+  nightTex.colorSpace = THREE.SRGBColorSpace;
+
+  const mat = new THREE.MeshStandardMaterial({
+    map: dayTex,
+    roughness: 0.7,
+    metalness: 0.1,
+  });
+
+  const mesh = new THREE.Mesh(sharedPlanetGeo, mat);
+  mesh.scale.setScalar(2);
+  group.add(mesh);
+
+  const atmoMat = new THREE.ShaderMaterial({
+    uniforms: { glowColor: { value: new THREE.Color(0.3, 0.6, 1.0) } },
+    vertexShader: atmosphereVertex,
+    fragmentShader: atmosphereFragment,
+    side: THREE.FrontSide,
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+    depthWrite: false,
+  });
+  const atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(2.15, 48, 48), atmoMat);
+  group.add(atmoMesh);
+
+  group.visible = false;
+  scene.add(group);
+  return group;
+}
+
 export function initPlanets(data: DataItem[]): void {
   for (let i = 0; i < data.length; i++) {
     const planetData: PlanetData = {
@@ -156,10 +196,12 @@ export function initPlanets(data: DataItem[]): void {
     };
     createPlanetGroup(planetData, data[i]);
   }
+  earthGroup = createEarthGroup();
 }
 
 export function rebuildPlanets(data: DataItem[]): void {
   for (const g of allPlanetGroups) scene.remove(g);
+  if (earthGroup) scene.remove(earthGroup);
   allPlanetGroups.length = 0;
   planetMeshes.length = 0;
 
@@ -174,9 +216,23 @@ export function rebuildPlanets(data: DataItem[]): void {
     };
     createPlanetGroup(planetData, data[i]);
   }
+  earthGroup = createEarthGroup();
+}
+
+export function checkEarthEasterEgg(): boolean {
+  isEarthEasterEgg = Math.random() < EARTH_CHANCE;
+  return isEarthEasterEgg;
+}
+
+export function getActivePlanetGroup(): THREE.Group | null {
+  if (isEarthEasterEgg && earthGroup) return earthGroup;
+  const idx = state.selectedIdx;
+  if (idx >= 0 && idx < allPlanetGroups.length) return allPlanetGroups[idx];
+  return null;
 }
 
 export function hideAllPlanets(): void {
   for (const g of allPlanetGroups) g.visible = false;
+  if (earthGroup) earthGroup.visible = false;
   for (const s of state.flybySlots) s.group.visible = false;
 }
