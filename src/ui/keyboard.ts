@@ -1,9 +1,10 @@
 import { state } from '../state';
 import { Phase } from '../types';
-import { btnStart, btnNext, btnRetry, settingsOverlay } from './dom';
+import { btnStart, settingsOverlay } from './dom';
 import { audioManager } from '../audio/manager';
 import { startWarp } from '../animation/warp';
 import { onNextWinner, onRetry } from './result';
+import { setForceEarth } from '../scene/planets';
 
 function onKeydown(e: KeyboardEvent): void {
   const settingsOpen = settingsOverlay && !settingsOverlay.classList.contains('settings-hidden');
@@ -38,6 +39,10 @@ function onKeydown(e: KeyboardEvent): void {
       const optSound = document.getElementById('opt-sound') as HTMLInputElement;
       if (optSound) optSound.checked = state.settings.soundEnabled;
       audioManager.playBgm(state.settings.soundEnabled);
+      break;
+    case 'KeyE':
+      e.preventDefault();
+      setForceEarth(true);
       break;
   }
 }

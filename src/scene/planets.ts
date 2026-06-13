@@ -21,6 +21,7 @@ export const allPlanetGroups: THREE.Group[] = [];
 export const planetMeshes: THREE.Mesh[] = [];
 export let earthGroup: THREE.Group | null = null;
 export let isEarthEasterEgg = false;
+export let forceEarth = false;
 
 const EARTH_CHANCE = 0.12;
 
@@ -219,8 +220,17 @@ export function rebuildPlanets(data: DataItem[]): void {
   earthGroup = createEarthGroup();
 }
 
+export function setForceEarth(v: boolean): void {
+  forceEarth = v;
+}
+
 export function checkEarthEasterEgg(): boolean {
-  isEarthEasterEgg = Math.random() < EARTH_CHANCE;
+  if (forceEarth) {
+    isEarthEasterEgg = true;
+    forceEarth = false;
+  } else {
+    isEarthEasterEgg = Math.random() < EARTH_CHANCE;
+  }
   return isEarthEasterEgg;
 }
 
